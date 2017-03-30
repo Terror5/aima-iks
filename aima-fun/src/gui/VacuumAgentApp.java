@@ -11,7 +11,6 @@ import aima.core.environment.vacuum.NondeterministicVacuumEnvironment;
 import aima.core.environment.vacuum.ReflexVacuumAgent;
 import aima.core.environment.vacuum.SimpleReflexVacuumAgent;
 import aima.core.environment.vacuum.TableDrivenVacuumAgent;
-import aima.core.environment.vacuum.VacuumEnvironment;
 import aima.core.environment.vacuum.VacuumWorldActions;
 import aima.core.environment.vacuum.VacuumWorldGoalTest;
 import aima.core.environment.vacuum.VacuumWorldResults;
@@ -27,6 +26,7 @@ import aima.gui.fx.views.VacuumEnvironmentViewCtrl;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import vaccum.VacuumEnvironment;
 
 /**
  * Integrable application which demonstrates how different kinds of vacuum
@@ -96,7 +96,7 @@ public class VacuumAgentApp extends IntegrableApplication {
 			env = new VacuumEnvironment();
 			break;
 		case 1:
-			env = new NondeterministicVacuumEnvironment();
+			//env = new NondeterministicVacuumEnvironment();
 			break;
 		}
 		agent = null;
