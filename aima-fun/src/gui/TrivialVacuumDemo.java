@@ -25,7 +25,7 @@ public class TrivialVacuumDemo {
 		a = new ReflexVacuumAgent();
 		
 		env.addAgent(a);
-		env.step(16);
+		env.step(20);
 		env.notifyViews("Performance=" + env.getPerformanceMeasure(a));
 	}
 }

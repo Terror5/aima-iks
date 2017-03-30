@@ -5,12 +5,7 @@ import java.util.List;
 
 import aima.core.agent.impl.AbstractAgent;
 import aima.core.environment.vacuum.FullyObservableVacuumEnvironmentPerceptToStateFunction;
-import aima.core.environment.vacuum.ModelBasedReflexVacuumAgent;
 import aima.core.environment.vacuum.NondeterministicVacuumAgent;
-import aima.core.environment.vacuum.NondeterministicVacuumEnvironment;
-import aima.core.environment.vacuum.ReflexVacuumAgent;
-import aima.core.environment.vacuum.SimpleReflexVacuumAgent;
-import aima.core.environment.vacuum.TableDrivenVacuumAgent;
 import aima.core.environment.vacuum.VacuumWorldActions;
 import aima.core.environment.vacuum.VacuumWorldGoalTest;
 import aima.core.environment.vacuum.VacuumWorldResults;
@@ -22,10 +17,10 @@ import aima.gui.fx.framework.Parameter;
 import aima.gui.fx.framework.SimulationPaneBuilder;
 import aima.gui.fx.framework.SimulationPaneCtrl;
 import aima.gui.fx.views.SimpleEnvironmentViewCtrl;
-import aima.gui.fx.views.VacuumEnvironmentViewCtrl;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import vaccum.ReflexVacuumAgent;
 import vaccum.VacuumEnvironment;
 
 /**
@@ -82,9 +77,8 @@ public class VacuumAgentApp extends IntegrableApplication {
 	}
 
 	protected List<Parameter> createParameters() {
-		Parameter p1 = new Parameter(PARAM_ENV, "A/B Deterministic Environment", "A/B Non-Deterministic Environment");
-		Parameter p2 = new Parameter(PARAM_AGENT, "TableDrivenVacuumAgent", "ReflexVacuumAgent",
-				"SimpleReflexVacuumAgent", "ModelBasedReflexVacuumAgent", "NondeterministicVacuumAgent");
+		Parameter p1 = new Parameter(PARAM_ENV, "A/B Deterministic Environment", "not implemented");
+		Parameter p2 = new Parameter(PARAM_AGENT, "ReflexVacuumAgent", "ReflexVacuumAgentWithMemory");
 		return Arrays.asList(p1, p2);
 	}
 
@@ -102,19 +96,10 @@ public class VacuumAgentApp extends IntegrableApplication {
 		agent = null;
 		switch (simPaneCtrl.getParamValueIndex(PARAM_AGENT)) {
 		case 0:
-			agent = new TableDrivenVacuumAgent();
+			agent = new ReflexVacuumAgent();
 			break;
 		case 1:
 			agent = new ReflexVacuumAgent();
-			break;
-		case 2:
-			agent = new SimpleReflexVacuumAgent();
-			break;
-		case 3:
-			agent = new ModelBasedReflexVacuumAgent();
-			break;
-		case 4:
-			agent = createNondeterministicVacuumAgent();
 			break;
 		}
 		if (env != null && agent != null) {

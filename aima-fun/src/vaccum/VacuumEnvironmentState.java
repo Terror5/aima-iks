@@ -56,10 +56,15 @@ public class VacuumEnvironmentState implements EnvironmentState, FullyObservable
 	
 	public void moveAgentTo(Agent a, AgentMove move) {
 		Integer location = agentLocations.get(a);
-		if(move == AgentMove.Left && location != VacuumEnvironment.LEFT_BOUND)
+		if(move == AgentMove.Left && location != VacuumEnvironment.LEFT_BOUND) {
+			location -= 1;
 			setAgentLocation(a, location);
-		if(move == AgentMove.Right && location != VacuumEnvironment.RIGHT_BOUND)
+		}
+			
+		if(move == AgentMove.Right && location != VacuumEnvironment.RIGHT_BOUND) {
+			location += 1;
 			setAgentLocation(a, location);
+		}
 	}
 
 	@Override

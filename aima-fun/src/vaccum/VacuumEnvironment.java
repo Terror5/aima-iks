@@ -2,6 +2,7 @@ package vaccum;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class VacuumEnvironment extends AbstractEnvironment {
 	public static final Action ACTION_MOVE_RIGHT = new DynamicAction("Right");
 	public static final Action ACTION_SUCK = new DynamicAction("Suck");
 	
-	public static final int[] LOCATION_MAP = {0,1,2,3,4,5,6,7};
+	public static final Integer[] LOCATION_MAP = {0,1,2,3,4,5,6,7};
 	public static final int LEFT_BOUND = 0;
 	public static final int RIGHT_BOUND = 7;
 
@@ -65,12 +66,8 @@ public class VacuumEnvironment extends AbstractEnvironment {
 		return envState;
 	}
 	
-	public List<String> getLocations() {
-		List<String> list = new ArrayList<String>();
-		for(Integer i : LOCATION_MAP) {
-			list.add(i.toString());
-		}
-		return list;
+	public List<Integer> getLocations() {
+		return Arrays.asList(LOCATION_MAP);
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package vaccum;
 
 import aima.core.agent.Agent;
 import aima.core.agent.impl.DynamicPercept;
-import vaccum.VacuumEnvironmentState.AgentMove;
 
 /**
  * Represents a local percept in the vacuum environment (i.e. details the
