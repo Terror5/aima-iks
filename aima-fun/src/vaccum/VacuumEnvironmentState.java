@@ -6,10 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Represents a state in the Vacuum World
- * 
- * @author Ciaran O'Reilly
- * @author Andrew Brown
+ * @author Florian Unger
  */
 public class VacuumEnvironmentState implements EnvironmentState, FullyObservableVacuumEnvironmentPercept, Cloneable {
 

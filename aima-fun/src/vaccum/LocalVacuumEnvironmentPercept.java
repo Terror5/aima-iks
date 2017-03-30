@@ -4,13 +4,7 @@ import aima.core.agent.Agent;
 import aima.core.agent.impl.DynamicPercept;
 
 /**
- * Represents a local percept in the vacuum environment (i.e. details the
- * agent's location and the state of the square the agent is currently at).
- * 
- * @author Ravi Mohan
- * @author Ciaran O'Reilly
- * @author Mike Stampone
- * @author Andrew Brown
+ * @author Florian Unger
  */
 public class LocalVacuumEnvironmentPercept extends DynamicPercept {
 

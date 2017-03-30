@@ -1,8 +1,6 @@
 package vaccum;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,18 +16,7 @@ import aima.core.environment.vacuum.NondeterministicVacuumAgent;
 import vaccum.VacuumEnvironmentState.AgentMove;
 
 /**
- * Artificial Intelligence A Modern Approach (3rd Edition): pg 58.<br>
- * <br>
- * Let the world contain just two locations. Each location may or may not
- * contain dirt, and the agent may be in one location or the other. There are 8
- * possible world states, as shown in Figure 3.2. The agent has three possible
- * actions in this version of the vacuum world: <em>Left</em>, <em>Right</em>,
- * and <em>Suck</em>. Assume for the moment, that sucking is 100% effective. The
- * goal is to clean up all the dirt.
- * 
- * @author Ravi Mohan
- * @author Ciaran O'Reilly
- * @author Mike Stampone
+ * @author Florian Unger
  */
 public class VacuumEnvironment extends AbstractEnvironment {
 	// Allowable Actions within the Vacuum Environment

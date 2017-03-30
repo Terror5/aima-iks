@@ -20,6 +20,7 @@ import aima.gui.fx.views.SimpleEnvironmentViewCtrl;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import vaccum.ModelBasedReflexVacuumAgent;
 import vaccum.ReflexVacuumAgent;
 import vaccum.VacuumEnvironment;
 
@@ -99,7 +100,7 @@ public class VacuumAgentApp extends IntegrableApplication {
 			agent = new ReflexVacuumAgent();
 			break;
 		case 1:
-			agent = new ReflexVacuumAgent();
+			agent = new ModelBasedReflexVacuumAgent();
 			break;
 		}
 		if (env != null && agent != null) {

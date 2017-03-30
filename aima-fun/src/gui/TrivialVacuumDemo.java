@@ -4,7 +4,7 @@ import aima.core.agent.Agent;
 import aima.core.agent.Environment;
 import aima.core.agent.EnvironmentView;
 import aima.core.agent.impl.SimpleEnvironmentView;
-import vaccum.ReflexVacuumAgent;
+import vaccum.ModelBasedReflexVacuumAgent;
 import vaccum.VacuumEnvironment;
 
 
@@ -22,7 +22,8 @@ public class TrivialVacuumDemo {
 		env.addEnvironmentView(view);
 		
 		Agent a = null;
-		a = new ReflexVacuumAgent();
+//		a = new ReflexVacuumAgent();
+		a = new ModelBasedReflexVacuumAgent();
 		
 		env.addAgent(a);
 		env.step(20);
