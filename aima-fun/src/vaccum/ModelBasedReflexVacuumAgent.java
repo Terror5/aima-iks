@@ -48,16 +48,12 @@ public class ModelBasedReflexVacuumAgent extends AbstractAgent {
 				if(r == false) 
 					state.setAttribute(ATTRIBUTE_REACHED_RIGHT, r);			
 				
-				System.out.println(l + "  " + r);
-				
 				//set boundaries reached to true if agent is at boundary	
 				if(vep.isAgentAtLeftBoundary()) {
-					System.out.println("left");
 					state.setAttribute(ATTRIBUTE_REACHED_LEFT,
 							vep.isAgentAtLeftBoundary());
 				}
 				if(vep.isAgentAtRightBoundary()){
-					System.out.println("right");
 					state.setAttribute(ATTRIBUTE_REACHED_RIGHT,
 							vep.isAgentAtRightBoundary());
 				}
