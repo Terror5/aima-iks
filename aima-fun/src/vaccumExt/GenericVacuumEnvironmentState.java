@@ -1,17 +1,18 @@
 package vaccumExt;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import aima.core.agent.Agent;
 import aima.core.agent.EnvironmentState;
-
 
 public class GenericVacuumEnvironmentState<T> implements EnvironmentState, FullyObservableVacuumEnvironmentPercept<T>, Cloneable {
 
 		private Map<T, LocationState> state;
 		private Map<Agent, T> agentLocations;
+		 
 
 		/**
 		 * Constructor
@@ -24,14 +25,20 @@ public class GenericVacuumEnvironmentState<T> implements EnvironmentState, Fully
 		/**
 		 * Constructor
 		 * 
-		 * @param keys
-		 * @param locationStates
+		 * @param set
+		 * @param collection
 		 */
-		public GenericVacuumEnvironmentState(List<T> keys, List<LocationState> locationStates) {
+		public GenericVacuumEnvironmentState(Map<T, LocationState> stateMap) {
 			this();
-			for(int i=0; i < keys.size(); ++i){
-				state.put(keys.get(i), locationStates.get(i));
-			}
+			state = stateMap;
+		}
+		
+		public List<T> getLocations() {
+			Iterator<T> keyIterator = state.keySet().iterator();
+			List<T> locations = new ArrayList<T>();
+			while(keyIterator.hasNext())
+				locations.add(keyIterator.next());
+			return locations;
 		}
 
 		@Override
@@ -104,5 +111,20 @@ public class GenericVacuumEnvironmentState<T> implements EnvironmentState, Fully
 		@Override
 		public String toString() {
 			return this.state.toString();
+		}
+
+		public void moveAgentTo(Agent a, AgentMove move) {
+			T location = agentLocations.get(a);
+			//TODO mapping from T location to idx
+			int idx = 1;
+			if(move == AgentMove.Left && idx != 0) {
+				idx -= 1;
+				setAgentLocation(a, location);
+			}
+				
+			if(move == AgentMove.Right && idx != (agentLocations.size() - 1)) {
+				idx += 1;
+				setAgentLocation(a, location);
+			}
 		}
 }

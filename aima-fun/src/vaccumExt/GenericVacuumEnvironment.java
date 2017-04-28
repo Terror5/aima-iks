@@ -2,9 +2,11 @@ package vaccumExt;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import aima.core.agent.Action;
 import aima.core.agent.Agent;
@@ -12,23 +14,17 @@ import aima.core.agent.Percept;
 import aima.core.agent.impl.AbstractEnvironment;
 import aima.core.agent.impl.DynamicAction;
 import aima.core.environment.vacuum.NondeterministicVacuumAgent;
-import vaccum.VacuumEnvironmentState.AgentMove;
 
 /**
  * @author Florian Unger
  */
-public class VacuumEnvironment<T> extends AbstractEnvironment {
+public class GenericVacuumEnvironment<T> extends AbstractEnvironment {
 	// Allowable Actions within the Vacuum Environment
 	public static final Action ACTION_MOVE_LEFT = new DynamicAction("Left");
 	public static final Action ACTION_MOVE_RIGHT = new DynamicAction("Right");
 	public static final Action ACTION_SUCK = new DynamicAction("Suck");
 	
-	public static final Integer[] LOCATION_MAP = {0,1,2,3,4,5,6,7};
-	public static final int LEFT_BOUND = 0;
-	public static final int RIGHT_BOUND = 7;
-
-
-	//
+	
 	protected GenericVacuumEnvironmentState<T> envState = null;
 	protected boolean isDone = false;
 
@@ -36,12 +32,13 @@ public class VacuumEnvironment<T> extends AbstractEnvironment {
 	 * Constructs a vacuum environment with two locations, in which dirt is
 	 * placed at random.
 	 */
-	public VacuumEnvironment() {
+	public GenericVacuumEnvironment(Set<T> keys) {
 		Random r = new Random();
 		
 		Map<T, LocationState> locationStates = new HashMap<T, LocationState>();
-		for(T i : LOCATION_MAP)
-				locationStates.put(i, (0 == r.nextInt(2)) ? LocationState.Clean : LocationState.Dirty);
+		Iterator<T> keyIterator = keys.iterator();
+		while(keyIterator.hasNext())
+			locationStates.put(keyIterator.next(), (0 == r.nextInt(2)) ? LocationState.Clean : LocationState.Dirty);
 		envState = new GenericVacuumEnvironmentState<T> (locationStates);
 	}
 
@@ -49,8 +46,8 @@ public class VacuumEnvironment<T> extends AbstractEnvironment {
 		return envState;
 	}
 	
-	public List<Integer> getLocations() {
-		return Arrays.asList(LOCATION_MAP);
+	public List<T> getLocations() {
+		return envState.getLocations();
 	}
 
 	@Override
@@ -83,7 +80,7 @@ public class VacuumEnvironment<T> extends AbstractEnvironment {
     		return envState.clone();
     	}
 		T agentLocation = envState.getAgentLocation(anAgent);
-		return new LocalVacuumEnvironmentPercept(agentLocation,
+		return new GenericLocalVacuumEnvironmentPercept(agentLocation,
 				envState.getLocationState(agentLocation));
 	}
 
@@ -94,8 +91,9 @@ public class VacuumEnvironment<T> extends AbstractEnvironment {
 
 	@Override
 	public void addAgent(Agent a) {
-		T idx = new Random().nextInt(8);
-		envState.setAgentLocation(a, idx);
+		//TODO init random indx
+//		T idx = new Random().nextInt(8);
+//		envState.setAgentLocation(a, idx);
 		super.addAgent(a);
 	}
 

@@ -4,5 +4,6 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/aima-core"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/aima-gui"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/aimax-osm"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
