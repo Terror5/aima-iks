@@ -41,6 +41,12 @@ public class TimeCarStepCostFunction implements StepCostFunction {
 		}	
 		return speed;
 	}
+	
+	public static double getETA(MapWay way, double distance) {
+		double speed = getSpeed(way);
+		return  1 / (speed / distance);
+	}
+	
 
 	@Override
 	public double c(Object s, Action a, Object sDelta) {
@@ -48,10 +54,8 @@ public class TimeCarStepCostFunction implements StepCostFunction {
 		MapNode stateTo = (MapNode) sDelta;
 		OsmMoveAction action = (OsmMoveAction) a;
 		
-		
-		double speed = getSpeed(action.getWay());
-		
-		return  1 / (action.getTravelDistance() * speed);
+		return getETA(action.getWay(),action.getTravelDistance());
+
 	}
 
 }
