@@ -60,9 +60,12 @@ public class MyRouteCalculator extends RouteCalculator {
 						OsmMoveAction a = (OsmMoveAction) action;
 						for (MapNode node : a.getNodes())
 							if (result.isEmpty()
-									|| result.get(result.size() - 1) != node)
+									|| result.get(result.size() - 1) != node) {
 								result.add(new Position(node.getLat(), node
 										.getLon()));
+								//FUN - Add ETA from way to static list -> for time display in the end
+								MyOsmRoutePlannerApp.addWay(a.getWay());								
+							}
 					}
 				}
 			}

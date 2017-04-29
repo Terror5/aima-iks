@@ -38,8 +38,10 @@ public class TimeCarStepCostFunction implements StepCostFunction {
 			} catch (Exception e) {
 				System.err.println(e.getMessage());
 			}	
-		}	
-		return speed;
+		}
+		
+		//just in case - highwayType was not in rulemap
+		return (speed == null) ? 1.0d : speed;
 	}
 	
 	public static double getETA(MapWay way, double distance) {
