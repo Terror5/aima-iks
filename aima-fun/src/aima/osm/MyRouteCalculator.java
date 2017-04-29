@@ -13,6 +13,7 @@ import aimax.osm.data.OsmMap;
 import aimax.osm.data.Position;
 import aimax.osm.data.entities.MapNode;
 import aimax.osm.routing.OsmMoveAction;
+import aimax.osm.routing.OsmSldHeuristicFunction;
 import aimax.osm.routing.RouteCalculator;
 import aimax.osm.routing.RouteFindingProblem;
 
@@ -24,19 +25,32 @@ public class MyRouteCalculator extends RouteCalculator {
 	private int taskSuperIdx = super.getTaskSelectionOptions().length;
 	private int taskTimeCarIdx = taskSuperIdx;
 	private int taskBikeFunIdx = taskTimeCarIdx + 1;
+	private int taskTimeCarManIdx = taskBikeFunIdx + 1;
+	private int taskBikeFunManIdx = taskTimeCarManIdx + 1;
+	private int taskTimeCarMalaIdx = taskBikeFunManIdx + 1;
+	private int taskBikeFunMalaIdx = taskTimeCarMalaIdx + 1;
 	
 	@Override
 	public String[] getTaskSelectionOptions() {
 		String[] superOptions = super.getTaskSelectionOptions();
-		String[] selectOptions = new String[superOptions.length + 2];
+		String[] selectOptions = new String[superOptions.length + 6];
 		
 		for(int i = 0; i < superOptions.length; ++i)
 			selectOptions[i] = superOptions[i];
 		
-		selectOptions[taskTimeCarIdx] = "Time (Car)";
-		selectOptions[taskBikeFunIdx] = "Fun (Bike)";
+		selectOptions[taskTimeCarIdx] = "Time (Car) SLD";
+		selectOptions[taskBikeFunIdx] = "Fun (Bike) SLD";
+		selectOptions[taskTimeCarManIdx] = "Time (Car) Manhattan";
+		selectOptions[taskBikeFunManIdx] = "Fun (Bike) Manhattan";
+		selectOptions[taskTimeCarMalaIdx] = "Time (Car) Mahalanobis";
+		selectOptions[taskBikeFunMalaIdx] = "Fun (Bike) Mahalanobis";
  		return selectOptions;
 	}
+	
+	public String[] getHeuristicsSelectionOptions() {
+ 		return  new String[] { "SLD", "Mahalanobis", "Manhattan" };
+	}
+	
 
 	@Override
 	public List<Position> calculateRoute(List<MapNode> markers, OsmMap map, int taskSelection) {
@@ -77,23 +91,22 @@ public class MyRouteCalculator extends RouteCalculator {
 
 	@Override
 	protected HeuristicFunction createHeuristicFunction(MapNode[] pNodes, int taskSelection) {
-		if(taskSuperIdx < taskSelection) {
-			return super.createHeuristicFunction(pNodes, taskSelection);
+		
+		if(taskTimeCarManIdx == taskSelection || taskBikeFunManIdx == taskSelection) {	
+			return new ManhattanDistance(pNodes[1]);
+		} else if (taskTimeCarMalaIdx == taskSelection || taskBikeFunMalaIdx == taskSelection){	
+			return new SimpleMahalanobisDistance(pNodes[1]);
 		} else {
-			if(taskTimeCarIdx == taskSelection) {
-				return new TimeCarHeuristicFunction(pNodes[1]);
-			} else {
-				return new FunBikeHeuristicFunction(pNodes[1]);
-			}
-		}
+			return new OsmSldHeuristicFunction(pNodes[1]);
+		}	
 	}
 
 	@Override
 	protected MapWayFilter createMapWayFilter(OsmMap map, int taskSelection) {
-		if(taskSuperIdx < taskSelection) {
+		if(taskSuperIdx > taskSelection) {
 			return super.createMapWayFilter(map, taskSelection);
 		} else {
-			if(taskTimeCarIdx == taskSelection) {
+			if(taskTimeCarIdx == taskSelection || taskTimeCarManIdx == taskSelection || taskTimeCarMalaIdx == taskSelection) {
 				return super.createMapWayFilter(map, CAR_FILTER);
 			} else {
 				return super.createMapWayFilter(map, BIKE_FILTER);
@@ -104,10 +117,10 @@ public class MyRouteCalculator extends RouteCalculator {
 	@Override
 	protected Problem createProblem(MapNode[] pNodes, OsmMap map, MapWayFilter wayFilter, boolean ignoreOneways,
 			int taskSelection) {
-		if(taskSuperIdx < taskSelection) {		
+		if(taskSuperIdx > taskSelection) {
 			return super.createProblem(pNodes, map, wayFilter, ignoreOneways, taskSelection);
 		} else {
-			if(taskTimeCarIdx == taskSelection) {
+			if(taskTimeCarIdx == taskSelection || taskTimeCarManIdx == taskSelection || taskTimeCarMalaIdx == taskSelection) {
 				return new RouteFindingProblem(pNodes[0], pNodes[1], wayFilter,
 						ignoreOneways, new TimeCarStepCostFunction());
 			} else {

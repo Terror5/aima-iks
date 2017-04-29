@@ -34,7 +34,7 @@ public class MyOsmRoutePlannerApp extends OsmRoutePlannerApp {
         DecimalFormat f1 = new DecimalFormat("#0.00");
         
 		details.append(" ETA: ");
-		details.append(f1.format(calculateETA(nodes)*60));
+		details.append(f1.format(calculateETA(nodes)));
 		details.append(" min");
 		
 		clearWays();
@@ -58,7 +58,7 @@ public class MyOsmRoutePlannerApp extends OsmRoutePlannerApp {
 		}		
 		return result;
 	}
-	
+
 	public static void addWay(MapWay way) {
 		DefaultMapWay defaultMapWay = new DefaultMapWay(way.getId());
 		defaultMapWay.setAttributes(Arrays.asList(way.getAttributes()));

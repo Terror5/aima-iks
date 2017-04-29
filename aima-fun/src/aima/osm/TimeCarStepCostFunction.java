@@ -9,7 +9,7 @@ import aimax.osm.data.entities.MapWay;
 import aimax.osm.routing.OsmMoveAction;
 
 public class TimeCarStepCostFunction implements StepCostFunction {
-	
+
 	private static HashMap<String, Double> ruleMap = new HashMap<String, Double>();
 	
 	static{
@@ -36,7 +36,7 @@ public class TimeCarStepCostFunction implements StepCostFunction {
 			try {
 				speed = Double.parseDouble(way.getAttributeValue("maxspeed"));
 			} catch (Exception e) {
-				System.err.println(e.getMessage());
+				//System.err.println(e.getMessage());
 			}	
 		}
 		
@@ -44,20 +44,25 @@ public class TimeCarStepCostFunction implements StepCostFunction {
 		return (speed == null) ? 1.0d : speed;
 	}
 	
+	/**
+	 * returns ETA in minutes
+	 * 
+	 */
 	public static double getETA(MapWay way, double distance) {
 		double speed = getSpeed(way);
-		return  1 / (speed / distance);
+		return  (1 / (speed / distance))*60;
 	}
 	
+	public TimeCarStepCostFunction() {
+		System.out.println("Using TimeCarStepCostFunction");
+	}
 
 	@Override
 	public double c(Object s, Action a, Object sDelta) {
 		MapNode stateFrom = (MapNode) s;
 		MapNode stateTo = (MapNode) sDelta;
 		OsmMoveAction action = (OsmMoveAction) a;
-		
 		return getETA(action.getWay(),action.getTravelDistance());
-
 	}
 
 }
