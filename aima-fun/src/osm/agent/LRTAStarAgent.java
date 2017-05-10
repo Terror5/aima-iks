@@ -15,6 +15,8 @@ import aima.core.util.datastructure.TwoKeyHashMap;
 
 
 public class LRTAStarAgent extends AbstractAgent {
+	
+	private static int moveBack = 0;
 
 	private OnlineSearchProblem problem;
 	private PerceptToStateFunction ptsFunction;
@@ -135,7 +137,9 @@ public class LRTAStarAgent extends AbstractAgent {
 						min = cost;
 					}
 				}
-				//H.put(s, min);
+				// only override min if not already calculated
+				if (!H.containsKey(s))
+					H.put(s, min); 
 			}
 			// a <- an action b in ACTIONS(s') that minimizes LRTA*-COST(s', b,
 			// result[s', b], H)
@@ -143,18 +147,44 @@ public class LRTAStarAgent extends AbstractAgent {
 			// Just in case no actions
 			a = NoOpAction.NO_OP;
 			for (Action b : actions(sDelta)) {
+				//StepCost for a move from current to a previous state (including heuristics)
 				double cost = lrtaCost(sDelta, b, result.get(sDelta, b));
+				
+				
+				double heuristicCurr = lrtaCost(sDelta, b, null);
+				double heuristicPrev = lrtaCost(s, b, null);
+				double costPrev = 0.0d;
+				double costCurr = H.get(sDelta);
+				double stepCost = 0.0d;
+				
+				if(null != result.get(sDelta, b))	
+						stepCost = getProblem().getStepCostFunction().c(sDelta, b, result.get(sDelta, b));
 				
 				// if the action is to move back
 				if(((MoveToAction) b).getToLocation().equals(s)){
-					// prefer other options
-					//cost = cost * (Math.random() + 1.0d);
-					cost *= 2;
+					
+					costPrev = H.get(s); // due to NullPointer
+					
+					// dislike directly going back if heuristic gets worse
+					if(heuristicPrev > heuristicCurr) {
+						cost *= 2;						
+					} else {
+						// converges fast to a solution, but to greedy
+						cost /= 2;
+						
+					}
 				}
 				
 				if (cost < min) {
 					min = cost;
 					a = b;
+					// i had to move back -> so make location worse (hopefully loop avoidance)
+					if(((MoveToAction) a).getToLocation().equals(s)){
+						
+						H.put(sDelta, costCurr + stepCost*10); // depending on location 5 - 10
+						++moveBack;
+						System.out.println("cost: " + cost + " currCost: " + costCurr + " Hmap: " + H.get(sDelta));
+					}
 				}
 			}
 		}
@@ -166,6 +196,7 @@ public class LRTAStarAgent extends AbstractAgent {
 			// I'm either at the Goal or can't get to it,
 			// which in either case I'm finished so just die.
 			setAlive(false);
+			System.out.println("I moved back " + moveBack + " times.");
 		}
 		// return a
 		return a;
@@ -180,6 +211,7 @@ public class LRTAStarAgent extends AbstractAgent {
 		H.clear();
 		s = null;
 		a = null;
+		moveBack = 0;
 	}
 
 	private boolean goalTest(Object state) {
@@ -193,6 +225,8 @@ public class LRTAStarAgent extends AbstractAgent {
 			return getHeuristicFunction().h(s);
 		}
 		// else return c(s, a, s') + H[s']
+		
+		// distance from s to sDelta + H(sDelta)
 		return getProblem().getStepCostFunction().c(s, action, sDelta)
 				+ H.get(sDelta);
 	}
