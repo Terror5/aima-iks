@@ -21,14 +21,13 @@ import aima.gui.fx.applications.search.NQueensSearchApp;
 import aima.gui.fx.applications.search.NQueensSearchDemo;
 import aima.gui.fx.applications.search.games.ConnectFourApp;
 import aima.gui.fx.applications.search.games.EightPuzzleApp;
+import aima.gui.fx.applications.search.games.SimpleSudokuApp;
 import aima.gui.fx.applications.search.games.TicTacToeApp;
 import aima.gui.fx.applications.search.local.GeneticMaximumFinderApp;
 import aima.gui.fx.applications.search.local.GeneticMaximumFinderDemo;
 import aima.gui.fx.applications.search.local.SimulatedAnnealingMaximumFinderApp;
-import aima.gui.fx.framework.IntegratedAppPaneBuilder;
+import aima.gui.fx.framework.IntegratedAppBuilder;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 /**
@@ -46,16 +45,15 @@ public class IntegratedAimaFxApp extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		IntegratedAppPaneBuilder builder = new IntegratedAppPaneBuilder();
+		IntegratedAppBuilder builder = new IntegratedAppBuilder();
 		builder.defineTitle("Integrated AIMA3e FX App");
+		builder.defineSceneSize(1200, 800);
 		defineContent(builder);
-		BorderPane root = new BorderPane();
-		builder.getResultFor(root, primaryStage);
-		primaryStage.setScene(new Scene(root, 1200, 800));
+		builder.getResultFor(primaryStage);
 		primaryStage.show();
 	}
 
-	public static void defineContent(IntegratedAppPaneBuilder builder) {
+	public static void defineContent(IntegratedAppBuilder builder) {
 		builder.registerApp(VacuumAgentApp.class);
 		builder.registerApp(RouteFindingAgentApp.class);
 
@@ -66,6 +64,7 @@ public class IntegratedAimaFxApp extends Application {
 		builder.registerApp(EightPuzzleApp.class);
 		builder.registerApp(ConnectFourApp.class);
 		builder.registerApp(TicTacToeApp.class);
+		builder.registerApp(SimpleSudokuApp.class);
 
 		builder.registerApp(SimulatedAnnealingMaximumFinderApp.class);
 		builder.registerApp(GeneticMaximumFinderApp.class);

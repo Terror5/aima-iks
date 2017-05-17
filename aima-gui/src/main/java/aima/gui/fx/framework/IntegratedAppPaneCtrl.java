@@ -17,7 +17,7 @@ import javafx.stage.Stage;
 
 /**
  * Controller class for integrated applications. Integrated applications are
- * built by the {@link IntegratedAppPaneBuilder} and provide access to
+ * built by the {@link IntegratedAppBuilder} and provide access to
  * {@link IntegrableApplication} instances and console applications. This
  * controller class is responsible starting applications, integrating their GUI
  * into the window of the integrated application, title update, and for scale
@@ -37,7 +37,7 @@ public class IntegratedAppPaneCtrl {
 
 	private DoubleProperty scale = new SimpleDoubleProperty();
 	private Optional<IntegrableApplication> currApp = Optional.empty();
-	private Optional<CancelableThread> currProgThread = Optional.empty();
+	private Optional<CancelableThread> currDemoThread = Optional.empty();
 
 	public IntegratedAppPaneCtrl() {
 		messageArea = new TextArea();
@@ -61,11 +61,10 @@ public class IntegratedAppPaneCtrl {
 	}
 
 	public void startApp(Class<? extends IntegrableApplication> appClass) {
-		stopRunningAppsAndProgs();
+		stopRunningAppsAndDemo();
 		try {
 			currApp = Optional.of(appClass.newInstance());
-			Method m = appClass.getMethod("createRootPane", new Class[0]);
-			Pane appPane = (Pane) m.invoke(currApp.get(), (Object[]) null);
+			Pane appPane = currApp.get().createRootPane();
 			pane.setCenter(appPane);
 			updateStageTitle();
 			currApp.get().initialize();
@@ -74,8 +73,8 @@ public class IntegratedAppPaneCtrl {
 		}
 	}
 
-	public void startProg(Class<?> progClass) {
-		stopRunningAppsAndProgs();
+	public void startDemo(Class<?> demoClass) {
+		stopRunningAppsAndDemo();
 		if (pane.getCenter() != messageScrollPane)
 			pane.setCenter(messageScrollPane);
 		messageArea.clear();
@@ -84,17 +83,17 @@ public class IntegratedAppPaneCtrl {
 		PrintStream pStream = messagePaneCtrl.getPrintStream();
 		System.setOut(pStream);
 		// System.setErr(messagePaneCtrl.getPrintStream());
-		currProgThread = Optional.of(new CancelableThread(() -> {
-			startMain(progClass);
+		currDemoThread = Optional.of(new CancelableThread(() -> {
+			startMain(demoClass);
 			pStream.flush();
 		}));
-		currProgThread.get().setDaemon(true);
-		currProgThread.get().start();
+		currDemoThread.get().setDaemon(true);
+		currDemoThread.get().start();
 	}
 
-	private void startMain(Class<?> progClass) {
+	private void startMain(Class<?> demoClass) {
 		try {
-			Method m = progClass.getMethod("main", String[].class);
+			Method m = demoClass.getMethod("main", String[].class);
 			m.invoke(null, (Object) new String[] {});
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
 				| SecurityException e) {
@@ -102,14 +101,14 @@ public class IntegratedAppPaneCtrl {
 		}
 	}
 
-	private void stopRunningAppsAndProgs() {
+	private void stopRunningAppsAndDemo() {
 		if (currApp.isPresent()) {
-			currApp.get().finalize();
+			currApp.get().cleanup();
 			currApp = Optional.empty();
 		}
-		if (currProgThread.isPresent()) {
-			currProgThread.get().cancel();
-			currProgThread = Optional.empty();
+		if (currDemoThread.isPresent()) {
+			currDemoThread.get().cancel();
+			currDemoThread = Optional.empty();
 		}
 	}
 

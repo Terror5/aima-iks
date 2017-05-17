@@ -24,7 +24,7 @@ import javafx.scene.input.MouseButton;
  */
 public class SimulationPaneCtrl {
 
-	public static enum State {
+	public enum State {
 		READY, RUNNING, FINISHED, PAUSED, CANCELED
 	}
 
@@ -38,7 +38,7 @@ public class SimulationPaneCtrl {
 	private Runnable initMethod;
 	private Runnable simMethod;
 
-	private ObjectProperty<State> state = new SimpleObjectProperty<State>();
+	private ObjectProperty<State> state = new SimpleObjectProperty<>();
 	private Optional<CancelableThread> simThread = Optional.empty();
 
 	/** Should only be called by the SimulationPaneBuilder. */

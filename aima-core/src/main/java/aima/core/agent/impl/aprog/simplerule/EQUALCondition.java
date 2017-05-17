@@ -23,7 +23,6 @@ public class EQUALCondition extends Condition {
 
 	@Override
 	public boolean evaluate(ObjectWithDynamicAttributes p) {
-		System.out.println(key + "  " + value + " ref: " + p.getAttribute(key));
 		return value.equals(p.getAttribute(key));
 	}
 

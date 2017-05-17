@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -17,22 +18,24 @@ import javafx.stage.Stage;
 
 /**
  * Builder for integrated applications. To create an integrated application,
- * just create a builder, define a title, register apps (integrable JavaFX
- * applications) and demos (command line applications) and place the result into a
- * scene of a stage.
+ * just create a builder, define a title, define scene size, register apps (integrable JavaFX
+ * applications) and demos (command line applications), and finally get the result from the
+ * builder and show it.
  * 
  * @author Ruediger Lunde
  */
-public class IntegratedAppPaneBuilder {
+public class IntegratedAppBuilder {
 
 	private MenuBar menuBar = new MenuBar();
 	private Menu appsMenu = new Menu("Apps");
 	private Menu demosMenu = new Menu("Demos");
 	private String title = "";
+	private double sceneWidth = 1200;
+	private double sceneHeight = 800;
 
 	private IntegratedAppPaneCtrl paneCtrl;
 
-	public IntegratedAppPaneBuilder() {
+	public IntegratedAppBuilder() {
 		paneCtrl = new IntegratedAppPaneCtrl();
 		final DoubleProperty scale = paneCtrl.scaleProperty();
 		MenuItem incScaleItem = new MenuItem("Inc Scale");
@@ -65,15 +68,22 @@ public class IntegratedAppPaneBuilder {
 	public void registerDemo(Class<?> demoClass) {
 		final IntegratedAppPaneCtrl ctrl = paneCtrl;
 		MenuItem item = new MenuItem(demoClass.getSimpleName());
-		item.setOnAction(ev -> ctrl.startProg(demoClass));
+		item.setOnAction(ev -> ctrl.startDemo(demoClass));
 		addToMenu(demosMenu, demoClass.getPackage().getName(), item);
 	}
 
+	public void defineSceneSize(double width, double height) {
+		sceneWidth = width;
+		sceneHeight = height;
+	}
+
 	/**
-	 * Adds a menu bar and a scalable container pane to the provided root pane and
-	 * returns a controller instance containing user interface logic.
+	 * Creates a scene with menu bar and a scalable container pane,
+	 * assigns it to the stage, and returns a controller instance containing
+	 * user interface logic.
+	 * @return A controller class (will seldom be used by the caller).
 	 */
-	public IntegratedAppPaneCtrl getResultFor(BorderPane root, Stage stage) {
+	public IntegratedAppPaneCtrl getResultFor(Stage stage) {
 
 		// create a pane, content is affected by scale
 		final DoubleProperty scale = paneCtrl.scaleProperty();
@@ -92,8 +102,10 @@ public class IntegratedAppPaneBuilder {
 
 		paneCtrl.setContext(appPane, stage, title);
 
+		BorderPane root = new BorderPane();
 		root.setTop(menuBar);
 		root.setCenter(appPaneContainer);
+		stage.setScene(new Scene(root, sceneWidth, sceneHeight));
 		// just in case, the builder is called twice...
 		IntegratedAppPaneCtrl result = paneCtrl;
 		paneCtrl = new IntegratedAppPaneCtrl();

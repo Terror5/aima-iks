@@ -142,4 +142,10 @@ public class VacuumAgentApp extends IntegrableApplication {
 				new VacuumWorldResults(agent), new VacuumWorldGoalTest(agent), new DefaultStepCostFunction());
 		return problem;
 	}
+
+	@Override
+	public void cleanup() {
+		// TODO Auto-generated method stub
+		
+	}
 }

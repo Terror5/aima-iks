@@ -1,7 +1,8 @@
-package aima.core.search.csp;
+package aima.core.search.csp.inference;
 
 import java.util.Queue;
 
+import aima.core.search.csp.*;
 import aima.core.search.framework.QueueFactory;
 
 /**
@@ -40,7 +41,7 @@ import aima.core.search.framework.QueueFactory;
  * 
  * @author Ruediger Lunde
  */
-public class AC3Strategy {
+public class AC3Strategy<VAR extends Variable, VAL> implements InferenceStrategy<VAR, VAL> {
 
 	/**
 	 * Makes a CSP consisting of binary constraints arc-consistent.
@@ -48,13 +49,12 @@ public class AC3Strategy {
 	 * @return An object which indicates success/failure and contains data to
 	 *         undo the operation.
 	 */
-	public DomainRestoreInfo reduceDomains(CSP csp) {
-		DomainRestoreInfo result = new DomainRestoreInfo();
-		Queue<Variable> queue = QueueFactory.<Variable>createLifoQueue();
-		for (Variable var : csp.getVariables())
-			queue.add(var);
-		reduceDomains(queue, csp, result);
-		return result.compactify();
+	public InferenceLog<VAR, VAL> apply(CSP<VAR, VAL> csp) {
+		Queue<VAR> queue = QueueFactory.createLifoQueue();
+		queue.addAll(csp.getVariables());
+		DomainLog<VAR, VAL> log = new DomainLog<>();
+		reduceDomains(queue, csp, log);
+		return log.compactify();
 	}
 
 	/**
@@ -65,33 +65,30 @@ public class AC3Strategy {
 	 * @return An object which indicates success/failure and contains data to
 	 *         undo the operation.
 	 */
-	public DomainRestoreInfo reduceDomains(Variable var, Object value, CSP csp) {
-		DomainRestoreInfo result = new DomainRestoreInfo();
-		Domain domain = csp.getDomain(var);
-		if (domain.contains(value)) {
-			if (domain.size() > 1) {
-				Queue<Variable> queue = QueueFactory.<Variable>createLifoQueue();
-				queue.add(var);
-				result.storeDomainFor(var, domain);
-				csp.setDomain(var, new Domain(new Object[] { value }));
-				reduceDomains(queue, csp, result);
-			}
-		} else {
-			result.setEmptyDomainFound(true);
+	public InferenceLog<VAR, VAL> apply(VAR var, Assignment<VAR, VAL> assignment, CSP<VAR, VAL> csp) {
+		Domain<VAL> domain = csp.getDomain(var);
+		VAL value = assignment.getValue(var);
+		assert domain.contains(value);
+		DomainLog<VAR, VAL> log = new DomainLog<>();
+		if (domain.size() > 1) {
+			Queue<VAR> queue = QueueFactory.createLifoQueue();
+			queue.add(var);
+			log.storeDomainFor(var, domain);
+			csp.setDomain(var, new Domain<>(value));
+			reduceDomains(queue, csp, log);
 		}
-		return result.compactify();
+		return log.compactify();
 	}
 
-	private void reduceDomains(Queue<Variable> queue, CSP csp,
-			DomainRestoreInfo info) {
+	private void reduceDomains(Queue<VAR> queue, CSP<VAR, VAL> csp, DomainLog<VAR, VAL> log) {
 		while (!queue.isEmpty()) {
-			Variable var = queue.remove();
-			for (Constraint constraint : csp.getConstraints(var)) {
+			VAR var = queue.remove();
+			for (Constraint<VAR, VAL> constraint : csp.getConstraints(var)) {
 				if (constraint.getScope().size() == 2) {
-					Variable neighbor = csp.getNeighbor(var, constraint);
-					if (revise(neighbor, var, constraint, csp, info)) {
+					VAR neighbor = csp.getNeighbor(var, constraint);
+					if (revise(neighbor, var, constraint, csp, log)) {
 						if (csp.getDomain(neighbor).isEmpty()) {
-							info.setEmptyDomainFound(true);
+							log.setEmptyDomainFound(true);
 							return;
 						}
 						queue.add(neighbor);
@@ -101,23 +98,27 @@ public class AC3Strategy {
 		}
 	}
 
-	private boolean revise(Variable xi, Variable xj, Constraint constraint,
-			CSP csp, DomainRestoreInfo info) {
+	/**
+	 * Establishes arc-consistency for (xi, xj).
+	 * @return Value true if the domain of xi was modified.
+	 */
+	private boolean revise(VAR xi, VAR xj, Constraint<VAR, VAL> constraint,
+			CSP<VAR, VAL> csp, DomainLog<VAR, VAL> log) {
 		boolean revised = false;
-		Assignment assignment = new Assignment();
-		for (Object iValue : csp.getDomain(xi)) {
-			assignment.setAssignment(xi, iValue);
+		Assignment<VAR, VAL> assignment = new Assignment<>();
+		for (VAL vi : csp.getDomain(xi)) {
+			assignment.add(xi, vi);
 			boolean consistentExtensionFound = false;
-			for (Object jValue : csp.getDomain(xj)) {
-				assignment.setAssignment(xj, jValue);
+			for (VAL vj : csp.getDomain(xj)) {
+				assignment.add(xj, vj);
 				if (constraint.isSatisfiedWith(assignment)) {
 					consistentExtensionFound = true;
 					break;
 				}
 			}
 			if (!consistentExtensionFound) {
-				info.storeDomainFor(xi, csp.getDomain(xi));
-				csp.removeValueFromDomain(xi, iValue);
+				log.storeDomainFor(xi, csp.getDomain(xi));
+				csp.removeValueFromDomain(xi, vi);
 				revised = true;
 			}
 		}

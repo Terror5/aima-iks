@@ -7,111 +7,100 @@ import java.util.List;
 
 /**
  * An assignment assigns values to some or all variables of a CSP.
- * 
+ *
  * @author Ruediger Lunde
  */
-public class Assignment {
-	/**
-	 * Contains all assigned variables. Positions reflect the the order in which
-	 * the variables were assigned to values.
-	 */
-	List<Variable> variables;
-	/** Maps variables to their assigned values. */
-	Hashtable<Variable, Object> variableToValue;
+public class Assignment<VAR extends Variable, VAL> {
+    /**
+     * Contains all assigned variables. Positions reflect the the order in which
+     * the variables were assigned to values.
+     */
+    private List<VAR> variables;
+    /**
+     * Maps variables to their assigned values.
+     */
+    private Hashtable<VAR, VAL> variableToValue;
 
-	public Assignment() {
-		variables = new ArrayList<Variable>();
-		variableToValue = new Hashtable<Variable, Object>();
-	}
+    public Assignment() {
+        variables = new ArrayList<>();
+        variableToValue = new Hashtable<>();
+    }
 
-	public List<Variable> getVariables() {
-		return Collections.unmodifiableList(variables);
-	}
+    public List<VAR> getVariables() {
+        return Collections.unmodifiableList(variables);
+    }
 
-	public Object getAssignment(Variable var) {
-		return variableToValue.get(var);
-	}
+    public VAL getValue(VAR var) {
+        return variableToValue.get(var);
+    }
 
-	public void setAssignment(Variable var, Object value) {
-		if (!variableToValue.containsKey(var))
-			variables.add(var);
-		variableToValue.put(var, value);
-	}
+    public void add(VAR var, VAL value) {
+        if (variableToValue.put(var, value) == null)
+            variables.add(var);
+    }
 
-	public void removeAssignment(Variable var) {
-		if (hasAssignmentFor(var)) {
-			variables.remove(var);
-			variableToValue.remove(var);
-		}
-	}
+    public void remove(VAR var) {
+        if (contains(var)) {
+            variableToValue.remove(var);
+            variables.remove(var);
+        }
+    }
 
-	public boolean hasAssignmentFor(Variable var) {
-		return variableToValue.get(var) != null;
-	}
+    public boolean contains(VAR var) {
+        return variableToValue.get(var) != null;
+    }
 
-	/**
-	 * Returns true if this assignment does not violate any constraints of
-	 * <code>constraints</code>.
-	 */
-	public boolean isConsistent(List<Constraint> constraints) {
-		for (Constraint cons : constraints)
-			if (!cons.isSatisfiedWith(this))
-				return false;
-		return true;
-	}
+    /**
+     * Returns true if this assignment does not violate any constraints of
+     * <code>constraints</code>.
+     */
+    public boolean isConsistent(List<Constraint<VAR, VAL>> constraints) {
+        for (Constraint<VAR, VAL> cons : constraints)
+            if (!cons.isSatisfiedWith(this))
+                return false;
+        return true;
+    }
 
-	/**
-	 * Returns true if this assignment assigns values to every variable of
-	 * <code>vars</code>.
-	 */
-	public boolean isComplete(List<Variable> vars) {
-		for (Variable var : vars) {
-			if (!hasAssignmentFor(var))
-				return false;
-		}
-		return true;
-	}
+    /**
+     * Returns true if this assignment assigns values to every variable of
+     * <code>vars</code>.
+     */
+    public boolean isComplete(List<VAR> vars) {
+        for (VAR var : vars) {
+            if (!contains(var))
+                return false;
+        }
+        return true;
+    }
 
-	/**
-	 * Returns true if this assignment assigns values to every variable of
-	 * <code>vars</code>.
-	 */
-	public boolean isComplete(Variable[] vars) {
-		for (Variable var : vars) {
-			if (!hasAssignmentFor(var))
-				return false;
-		}
-		return true;
-	}
+    /**
+     * Returns true if this assignment is consistent as well as complete with
+     * respect to the given CSP.
+     */
+    public boolean isSolution(CSP<VAR, VAL> csp) {
+        return isConsistent(csp.getConstraints())
+                && isComplete(csp.getVariables());
+    }
 
-	/**
-	 * Returns true if this assignment is consistent as well as complete with
-	 * respect to the given CSP.
-	 */
-	public boolean isSolution(CSP csp) {
-		return isConsistent(csp.getConstraints())
-				&& isComplete(csp.getVariables());
-	}
+    public Assignment<VAR, VAL> copy() {
+        Assignment<VAR, VAL> copy = new Assignment<>();
+        for (VAR var : variables) {
+            copy.add(var, variableToValue.get(var));
+        }
+        return copy;
+    }
 
-	public Assignment copy() {
-		Assignment copy = new Assignment();
-		for (Variable var : variables) {
-			copy.setAssignment(var, variableToValue.get(var));
-		}
-		return copy;
-	}
-
-	@Override
-	public String toString() {
-		boolean comma = false;
-		StringBuffer result = new StringBuffer("{");
-		for (Variable var : variables) {
-			if (comma)
-				result.append(", ");
-			result.append(var + "=" + variableToValue.get(var));
-			comma = true;
-		}
-		result.append("}");
-		return result.toString();
-	}
+    @Override
+    public String toString() {
+        boolean comma = false;
+        StringBuilder result = new StringBuilder("{");
+        for (VAR var : variables) {
+            if (comma)
+                result.append(", ");
+            result.append(var).append("=").append(variableToValue.get(var));
+            comma = true;
+        }
+        result.append("}");
+        return result.toString();
+    }
 }

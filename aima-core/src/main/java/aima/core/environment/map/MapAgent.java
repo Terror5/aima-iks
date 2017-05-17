@@ -9,12 +9,8 @@ import aima.core.agent.impl.DynamicState;
 import aima.core.search.framework.Informed;
 import aima.core.search.framework.ProblemSolvingAgent;
 import aima.core.search.framework.SearchForActions;
-import aima.core.search.framework.evalfunc.EvaluationFunction;
 import aima.core.search.framework.evalfunc.HeuristicFunctionFactory;
 import aima.core.search.framework.problem.Problem;
-import aima.core.search.informed.BestFirstSearch;
-import aima.core.search.informed.HeuristicEvaluationFunction;
-import aima.core.search.informed.RecursiveBestFirstSearch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +30,7 @@ public class MapAgent extends ProblemSolvingAgent {
 
 	protected final Map map;
 	protected final DynamicState state = new DynamicState();
-	protected final List<String> goals = new ArrayList<String>();
+	protected final List<String> goals = new ArrayList<>();
 	protected int currGoalIdx = -1;
 
 	// possibly null...

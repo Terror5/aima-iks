@@ -1,6 +1,7 @@
 package aima.core.search.csp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,80 +16,77 @@ import aima.core.util.ArrayIterator;
  * 
  * @author Ruediger Lunde
  */
-public class Domain implements Iterable<Object> {
+public class Domain<VAL> implements Iterable<VAL> {
 
-	private Object[] values;
+	private final Object[] values;
 
-	public Domain(List<?> values) {
-		this.values = new Object[values.size()];
-		for (int i = 0; i < values.size(); i++)
-			this.values[i] = values.get(i);
+	public Domain(List<VAL> values) {
+		this.values = values.toArray();
 	}
 
-	public Domain(Object[] values) {
-		this.values = new Object[values.length];
-		for (int i = 0; i < values.length; i++)
-			this.values[i] = values[i];
+	@SafeVarargs
+	public Domain(VAL... values) {
+		this.values = values;
 	}
 
 	public int size() {
 		return values.length;
 	}
 
-	public Object get(int index) {
-		return values[index];
+	@SuppressWarnings("unchecked")
+	public VAL get(int index) {
+		return (VAL) values[index];
 	}
 
 	public boolean isEmpty() {
 		return values.length == 0;
 	}
 
-	public boolean contains(Object value) {
+	public boolean contains(VAL value) {
 		for (Object v : values)
-			if (v.equals(value))
+			if (value.equals(v))
 				return true;
 		return false;
 	}
 
 	@Override
-	public Iterator<Object> iterator() {
-		return new ArrayIterator<Object>(values);
+	@SuppressWarnings("unchecked")
+	public Iterator<VAL> iterator() {
+		return new ArrayIterator<>((VAL[]) values);
 	}
 
 	/** Not very efficient... */
-	public List<Object> asList() {
-		List<Object> result = new ArrayList<Object>();
-		for (Object value : values)
-			result.add(value);
-		return result;
+	@SuppressWarnings("unchecked")
+	public List<VAL> asList() {
+		return Arrays.asList((VAL[]) values);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Domain) {
+		if (obj != null && getClass() == obj.getClass()) {
 			Domain d = (Domain) obj;
-			if (d.size() != values.length)
+			if (d.values.length != values.length)
 				return false;
-			else
-				for (int i = 0; i < values.length; i++)
-					if (!values[i].equals(d.values[i]))
-						return false;
+			for (int i = 0; i < values.length; i++)
+				if (!values[i].equals(d.values[i]))
+					return false;
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	@Override
 	public int hashCode() {
 		int hash = 9; // arbitrary seed value
 		int multiplier = 13; // arbitrary multiplier value
-		for (int i = 0; i < values.length; i++)
-			hash = hash * multiplier + values[i].hashCode();
+		for (Object value : values)
+			hash = hash * multiplier + value.hashCode();
 		return hash;
 	}
 
 	@Override
 	public String toString() {
-		StringBuffer result = new StringBuffer("{");
+		StringBuilder result = new StringBuilder("{");
 		boolean comma = false;
 		for (Object value : values) {
 			if (comma)

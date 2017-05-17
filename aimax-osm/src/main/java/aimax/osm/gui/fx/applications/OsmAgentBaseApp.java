@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import aima.core.agent.Action;
-import aima.core.agent.Agent;
-import aima.core.agent.Environment;
-import aima.core.agent.EnvironmentView;
+import aima.core.agent.*;
 import aima.core.environment.map.MapAgent;
 import aima.core.environment.map.MapEnvironment;
 import aima.core.environment.map.MapFunctionFactory;
@@ -178,9 +175,8 @@ public class OsmAgentBaseApp extends IntegrableApplication {
 		if (markers.size() < 2) {
 			simPaneCtrl.setStatus("Error: Please set at least two markers with mouse-left.");
 		} else {
-			List<String> locations = new ArrayList<String>(markers.size());
-			for (int i = 0; i < markers.size(); i++) {
-				MapNode node = markers.get(i);
+			List<String> locations = new ArrayList<>(markers.size());
+			for (MapNode node : markers) {
 				Point2D pt = new Point2D(node.getLon(), node.getLat());
 				locations.add(map.getNearestLocation(pt));
 			}
@@ -201,7 +197,7 @@ public class OsmAgentBaseApp extends IntegrableApplication {
 	}
 
 	@Override
-	public void finalize() {
+	public void cleanup() {
 		simPaneCtrl.cancelSimulation();
 	}
 
@@ -217,7 +213,7 @@ public class OsmAgentBaseApp extends IntegrableApplication {
 
 	// helper classes...
 
-	class TrackUpdater implements EnvironmentView {
+	private class TrackUpdater implements EnvironmentView {
 		int actionCounter = 0;
 
 		@Override
@@ -234,7 +230,7 @@ public class OsmAgentBaseApp extends IntegrableApplication {
 		 * Reacts on environment changes and updates the tracks.
 		 */
 		@Override
-		public void agentActed(Agent agent, Action command, Environment source) {
+		public void agentActed(Agent agent, Percept percept, Action command, Environment source) {
 			if (command instanceof MoveToAction) {
 				Metrics metrics = new Metrics();
 				Double travelDistance = env.getAgentTravelDistance(env.getAgents().get(0));

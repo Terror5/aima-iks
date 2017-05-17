@@ -1,5 +1,6 @@
 package aima.core.search.csp;
 
+import javax.naming.OperationNotSupportedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -18,11 +19,11 @@ import java.util.List;
  * 
  * @author Ruediger Lunde
  */
-public class CSP {
+public class CSP<VAR extends Variable, VAL> implements Cloneable {
 
-	private List<Variable> variables;
-	private List<Domain> domains;
-	private List<Constraint> constraints;
+	private List<VAR> variables;
+	private List<Domain<VAL>> domains;
+	private List<Constraint<VAR, VAL>> constraints;
 
 	/** Lookup, which maps a variable to its index in the list of variables. */
 	private Hashtable<Variable, Integer> varIndexHash;
@@ -30,37 +31,37 @@ public class CSP {
 	 * Constraint network. Maps variables to those constraints in which they
 	 * participate.
 	 */
-	private Hashtable<Variable, List<Constraint>> cnet;
+	private Hashtable<Variable, List<Constraint<VAR, VAL>>> cnet;
 
 	/** Creates a new CSP. */
 	public CSP() {
-		variables = new ArrayList<Variable>();
-		domains = new ArrayList<Domain>();
-		constraints = new ArrayList<Constraint>();
-		varIndexHash = new Hashtable<Variable, Integer>();
-		cnet = new Hashtable<Variable, List<Constraint>>();
+		variables = new ArrayList<>();
+		domains = new ArrayList<>();
+		constraints = new ArrayList<>();
+		varIndexHash = new Hashtable<>();
+		cnet = new Hashtable<>();
 	}
 	
 	/** Creates a new CSP. */
-	public CSP(List<Variable> vars) {
+	public CSP(List<VAR> vars) {
 		this();
-		for (Variable v : vars)
-			addVariable(v);
+		vars.forEach(this::addVariable);
 	}
 
-	protected void addVariable(Variable var) {
+	/** Adds a new variable only if its name is new. */
+	protected void addVariable(VAR var) {
 		if (!varIndexHash.containsKey(var)) {
-			Domain emptyDomain = new Domain(Collections.emptyList());
+			Domain<VAL> emptyDomain = new Domain<>(Collections.emptyList());
 			variables.add(var);
 			domains.add(emptyDomain);
 			varIndexHash.put(var, variables.size()-1);
-			cnet.put(var, new ArrayList<Constraint>());
+			cnet.put(var, new ArrayList<>());
 		} else {
 			throw new IllegalArgumentException("Variable with same name already exists.");
 		}
 	}
 	
-	public List<Variable> getVariables() {
+	public List<VAR> getVariables() {
 		return Collections.unmodifiableList(variables);
 	}
 
@@ -68,11 +69,11 @@ public class CSP {
 		return varIndexHash.get(var);
 	}
 
-	public Domain getDomain(Variable var) {
+	public Domain<VAL> getDomain(Variable var) {
 		return domains.get(varIndexHash.get(var));
 	}
 
-	public void setDomain(Variable var, Domain domain) {
+	public void setDomain(VAR var, Domain<VAL> domain) {
 		domains.set(indexOf(var), domain);
 	}
 
@@ -80,29 +81,29 @@ public class CSP {
 	 * Replaces the domain of the specified variable by new domain, which
 	 * contains all values of the old domain except the specified value.
 	 */
-	public void removeValueFromDomain(Variable var, Object value) {
-		Domain currDomain = getDomain(var);
-		List<Object> values = new ArrayList<Object>(currDomain.size());
-		for (Object v : currDomain)
+	public void removeValueFromDomain(VAR var, VAL value) {
+		Domain<VAL> currDomain = getDomain(var);
+		List<VAL> values = new ArrayList<>(currDomain.size());
+		for (VAL v : currDomain)
 			if (!v.equals(value))
 				values.add(v);
-		setDomain(var, new Domain(values));
+		setDomain(var, new Domain<>(values));
 	}
 
-	public void addConstraint(Constraint constraint) {
+	public void addConstraint(Constraint<VAR, VAL> constraint) {
 		constraints.add(constraint);
-		for (Variable var : constraint.getScope())
+		for (VAR var : constraint.getScope())
 			cnet.get(var).add(constraint);
 	}
 	
-	public List<Constraint> getConstraints() {
+	public List<Constraint<VAR, VAL>> getConstraints() {
 		return constraints;
 	}
 
 	/**
 	 * Returns all constraints in which the specified variable participates.
 	 */
-	public List<Constraint> getConstraints(Variable var) {
+	public List<Constraint<VAR, VAL>> getConstraints(Variable var) {
 		return cnet.get(var);
 	}
 
@@ -111,8 +112,8 @@ public class CSP {
 	 * 
 	 * @return a variable or null for non-binary constraints.
 	 */
-	public Variable getNeighbor(Variable var, Constraint constraint) {
-		List<Variable> scope = constraint.getScope();
+	public VAR getNeighbor(VAR var, Constraint<VAR, VAL> constraint) {
+		List<VAR> scope = constraint.getScope();
 		if (scope.size() == 2) {
 			if (var.equals(scope.get(0)))
 				return scope.get(1);
@@ -126,14 +127,16 @@ public class CSP {
 	 * Returns a copy which contains a copy of the domains list and is in all
 	 * other aspects a flat copy of this.
 	 */
-	public CSP copyDomains() {
-		CSP result = new CSP();
-		result.variables = variables;
-		result.domains = new ArrayList<Domain>(domains.size());
-		result.domains.addAll(domains);
-		result.constraints = constraints;
-		result.varIndexHash = varIndexHash;
-		result.cnet = cnet;
+    @SuppressWarnings("unchecked")
+	public CSP<VAR, VAL> copyDomains() {
+        CSP<VAR, VAL> result = null;
+        try {
+            result = (CSP<VAR, VAL>) clone();
+            result.domains = new ArrayList<>(domains.size());
+            result.domains.addAll(domains);
+        } catch (CloneNotSupportedException e) {
+            throw new UnsupportedOperationException("Could not copy domains.");
+        }
 		return result;
 	}
 }

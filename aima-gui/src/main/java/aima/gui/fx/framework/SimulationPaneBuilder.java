@@ -40,16 +40,22 @@ public class SimulationPaneBuilder {
 		this.stateView = Optional.of(stateView);
 	}
 
-	public final void defineSimMethod(Runnable simMethod) {
-		this.simMethod = Optional.of(simMethod);
-	}
-
 	public final void defineInitMethod(Runnable initMethod) {
 		this.initMethod = Optional.of(initMethod);
 	}
 
+	public final void defineSimMethod(Runnable simMethod) {
+		this.simMethod = Optional.of(simMethod);
+	}
+
+	/**
+	 * Adds a toolbar, a state view, and a status label to the provided pane and returns
+	 * a controller class instance. The toolbar contains combo boxes to control parameter settings
+	 * and buttons for simulation control. The controller class instance handles user events and provides
+	 * access to user settings (parameter settings, simulation speed, status text, ...).
+	 */
 	public SimulationPaneCtrl getResultFor(BorderPane pane) {
-		List<ComboBox<String>> combos = new ArrayList<ComboBox<String>>();
+		List<ComboBox<String>> combos = new ArrayList<>();
 		parameters.add(createSimSpeedParam());
 		for (Parameter param : parameters) {
 			ComboBox<String> combo = new ComboBox<>();
@@ -96,9 +102,8 @@ public class SimulationPaneBuilder {
 		if (!simMethod.isPresent())
 			throw new IllegalStateException("No simulation method defined.");
 
-		SimulationPaneCtrl result = new SimulationPaneCtrl(parameters, combos, initMethod.get(), simMethod.get(),
+		return new SimulationPaneCtrl(parameters, combos, initMethod.get(), simMethod.get(),
 				simBtn, statusLabel);
-		return result;
 	}
 
 	/**

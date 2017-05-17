@@ -4,16 +4,19 @@ import aima.core.search.csp.CSP;
 import aima.core.search.csp.Domain;
 import aima.core.search.csp.Variable;
 
-public class NQueensCSP extends CSP {
+import java.util.ArrayList;
+import java.util.List;
+
+public class NQueensCSP extends CSP<Variable, Integer> {
 
 	public NQueensCSP(int size) {
 		for (int i = 0; i < size; i++)
 			addVariable(new Variable("Q" + (i+1)));
 		
-		Integer[] values = new Integer[size];
-		for (int i = 0; i < size; i++)
-			values[i] = i+1;
-		Domain positions = new Domain(values);
+		List<Integer> values = new ArrayList<>();
+		for (int val = 1; val <= size; val++)
+			values.add(val);
+		Domain<Integer> positions = new Domain<>(values);
 
 		for (Variable var : getVariables())
 			setDomain(var, positions);

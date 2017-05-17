@@ -66,11 +66,11 @@ public class VacuumEnvironmentViewCtrl extends SimpleEnvironmentViewCtrl {
 		super.initialize(env);
 	}
 
-	@Override
-	public void agentActed(Agent agent, Action action, Environment source) {
-		agentInAction = (action == VacuumEnvironment.ACTION_SUCK) ? agent : null;
-		super.agentActed(agent, action, source);
-	}
+//	@Override
+//	public void agentActed(Agent agent, Action action, Environment source) {
+//		agentInAction = (action == VacuumEnvironment.ACTION_SUCK) ? agent : null;
+//		super.agentActed(agent, action, source);
+//	}
 
 	@Override
 	protected void updateEnvStateView(Environment env) {

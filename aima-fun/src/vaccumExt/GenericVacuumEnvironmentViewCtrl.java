@@ -64,11 +64,11 @@ public class GenericVacuumEnvironmentViewCtrl<T> extends SimpleEnvironmentViewCt
 		super.initialize(env);
 	}
 
-	@Override
-	public void agentActed(Agent agent, Action action, Environment source) {
-		agentInAction = (action == GenericVacuumEnvironment.ACTION_SUCK) ? agent : null;
-		super.agentActed(agent, action, source);
-	}
+//	@Override
+//	public void agentActed(Agent agent, Action action, Environment source) {
+//		agentInAction = (action == GenericVacuumEnvironment.ACTION_SUCK) ? agent : null;
+//		super.agentActed(agent, action, source);
+//	}
 
 	@Override
 	protected void updateEnvStateView(Environment env) {
